@@ -1,0 +1,10 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: flask-post-ing
+spec:
+  defaultBackend:
+    service:
+      name: flask-post-svc # Name of the Service targeted by the Ingress
+      port:
+        number: 80 # Should match the port used by the Service

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-post
+  labels:
+    app: flask-post
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask-post
+  template:
+    metadata:
+      labels:
+        app: flask-post
+    spec:
+      containers:
+      - name: flask-post
+        image: gcr.io/arched-iterator-357101/flask-post:0.1
+        ports:
+        - containerPort: 5000
+        imagePullPolicy: Always
