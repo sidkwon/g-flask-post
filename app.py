@@ -1,6 +1,35 @@
 import flask
 from flask import request, jsonify
+
+# [START trace_demo_imports]
+from opentelemetry import trace
+from opentelemetry.exporter.cloud_trace import CloudTraceSpanExporter
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
+from opentelemetry.propagate import set_global_textmap
+from opentelemetry.propagators.cloud_trace_propagator import CloudTraceFormatPropagator
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+# [END trace_demo_imports]
+
+# [START trace_demo_create_exporter]
+def configure_exporter(exporter):
+    set_global_textmap(CloudTraceFormatPropagator())
+    tracer_provider = TracerProvider()
+    tracer_provider.add_span_processor(BatchSpanProcessor(exporter))
+    trace.set_tracer_provider(tracer_provider)
+
+
+configure_exporter(CloudTraceSpanExporter())
+tracer = trace.get_tracer(__name__)
+# [END trace_demo_create_exporter]
+
+# [START trace_demo_middleware]
 app = flask.Flask(__name__)
+FlaskInstrumentor().instrument_app(app)
+RequestsInstrumentor().instrument()
+# [END trace_demo_middleware]
+
 app.config["DEBUG"] = True
 # Create some test data for our catalog in the form of a list of dictionaries.
 books = [
